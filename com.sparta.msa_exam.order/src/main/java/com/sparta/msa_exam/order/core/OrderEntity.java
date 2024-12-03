@@ -22,7 +22,7 @@ public class OrderEntity {
     @OneToMany(mappedBy = "orders")
     private List<OrderDetailEntity> product_ids;
 
-    private Long user_id;
+    private Long userId;
 
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
@@ -44,7 +44,7 @@ public class OrderEntity {
 
     public static OrderEntity createOrder(String userId, String email) {
         return OrderEntity.builder()
-                .user_id(Long.parseLong(userId))
+                .userId(Long.parseLong(userId))
                 .createdBy(email)
                 .status(OrderStatus.CREATED)
                 .build();

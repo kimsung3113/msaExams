@@ -4,6 +4,7 @@ import com.sparta.msa_exam.order.core.OrderDetailEntity;
 import com.sparta.msa_exam.order.core.OrderEntity;
 import com.sparta.msa_exam.order.core.client.ProductClient;
 import com.sparta.msa_exam.order.core.client.ProductResponseDto;
+import com.sparta.msa_exam.order.core.client.ProductSearchDto;
 import com.sparta.msa_exam.order.core.repository.OrderDetailRepository;
 import com.sparta.msa_exam.order.core.repository.OrderRepository;
 import com.sparta.msa_exam.order.orders.dto.OrderRequestDto;
@@ -12,6 +13,9 @@ import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -98,9 +102,9 @@ public class OrderService {
 
     @Transactional(readOnly = true)
     @Cacheable(cacheNames = "orderCache", key = "args[0]")
-    public OrderResponseDto getOrderById(Long orderId) {
+    public OrderResponseDto getOrderById(Long orderId, String userId) {
 
-        OrderEntity order = orderRepository.findById(orderId).
+        OrderEntity order = orderRepository.findByIdAndUserId(orderId, Long.parseLong(userId)).
                 orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found."));
 
         List<OrderDetailEntity> orderDetails = orderDetailRepository.findAllByOrders(order);
@@ -120,6 +124,48 @@ public class OrderService {
         response.setOrderProducts(orderProducts);
 
         return response;
+    }
+
+    @Transactional
+    public OrderResponseDto updateOrder(Long orderId, OrderRequestDto orderRequestDto) {
+
+        OrderEntity order = orderRepository.findById(orderId).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found."));
+
+        ProductSearchDto productSearchDto = new ProductSearchDto();
+        productSearchDto.setProductId(orderRequestDto.getProductsInOrderList().get(0).getProductId());
+
+        List<ProductResponseDto> content = productClient.getProducts(
+                productSearchDto, PageRequest.of(0, 10, Sort.by(Sort.Order.desc("createdAt")))).getContent();
+
+
+        if(content.isEmpty()){
+            return OrderResponseDto.builder()
+                    .description("주문 상품이 존재하지 않습니다")
+                    .build();
+        }
+
+        OrderDetailEntity orderDetail = OrderDetailEntity.createOrderDetailEntity(order, orderRequestDto
+                .getProductsInOrderList().get(0).getProductId(), orderRequestDto.getProductsInOrderList().get(0).getOrderCount());
+
+        orderDetailRepository.save(orderDetail);
+
+        List<OrderResponseDto.OrderProducts> orderProducts = new ArrayList<>();
+
+        List<OrderDetailEntity> orderDetails = orderDetailRepository.findAllByOrders(order);
+
+        for(OrderDetailEntity orderDetailEntity : orderDetails){
+
+            orderProducts.add(new OrderResponseDto.OrderProducts(orderDetailEntity.getProduct_id(), orderDetailEntity.getProduct_count()));
+
+        }
+
+        return OrderResponseDto.builder()
+                .orderId(order.getId())
+                .description("주문 추가 성공")
+                .status(order.getStatus())
+                .orderProducts(orderProducts)
+                .build();
     }
 
 

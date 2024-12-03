@@ -18,17 +18,11 @@ public class OrderResponseDto implements Serializable {
     private String description;
     private List<OrderProducts> orderProducts;
 
-//    public void setOrderProducts(OrderRequestDto.ProductsInOrder products){
-//        this.orderProducts.add(new OrderProducts(products.getProductId(), products.getOrderCount()));
-//    }
 
     public void setOrderProducts(List<OrderProducts> orderProducts) {
         this.orderProducts = orderProducts;
     }
 
-//    public void setOrderDetails(OrderDetailEntity detail){
-//        this.orderProducts.add(new OrderProducts(detail.getProduct_id(), detail.getProduct_count()));
-//    }
 
     @Data
     @Getter

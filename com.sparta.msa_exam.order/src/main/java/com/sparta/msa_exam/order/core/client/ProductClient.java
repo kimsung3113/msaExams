@@ -1,6 +1,8 @@
 package com.sparta.msa_exam.order.core.client;
 
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -12,4 +14,7 @@ public interface ProductClient {
 
     @GetMapping("/products/{id}/reduceQuantity")
     void reduceProductQuantity(@PathVariable("id") Long id, @RequestParam("quantity") int quantity);
+
+    @GetMapping("/products")
+    Page<ProductResponseDto> getProducts(@RequestParam ProductSearchDto searchDto, Pageable pageable);
 }

@@ -1,6 +1,7 @@
 package com.sparta.msa_exam.product.core;
 
 import com.sparta.msa_exam.product.products.dto.ProductsRequestDto;
+import com.sparta.msa_exam.product.products.dto.ProductsResponseDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -56,6 +57,16 @@ public class ProductEntity {
                 .quantity(requestDto.getQuantity())
                 .createdBy(email)
                 .build();
+    }
+
+    public ProductsResponseDto toResponseDto() {
+        return new ProductsResponseDto(
+                this.id,
+                this.name,
+                this.supply_price,
+                this.description,
+                this.quantity
+        );
     }
 
     public void reduceQuantity(int i) {
