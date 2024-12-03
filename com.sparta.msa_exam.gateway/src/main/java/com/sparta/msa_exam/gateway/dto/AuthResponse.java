@@ -7,6 +7,7 @@ import lombok.Setter;
 @Setter
 public class AuthResponse {
 
+    private String userId;
     private String email;
     private String role;
     private boolean isValid;

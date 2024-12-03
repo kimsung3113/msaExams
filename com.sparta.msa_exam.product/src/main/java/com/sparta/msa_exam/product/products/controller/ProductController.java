@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,9 +23,9 @@ public class ProductController {
     public ProductsResponseDto createProduct(@RequestBody ProductsRequestDto productRequestDto,
                                                             @RequestHeader(value = "X-User-Email", required = true) String email,
                                                             @RequestHeader(value = "X-Role", required = true) String role) {
-//        if (!"MANAGER".equals(role)) {
-//            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied. User role is not MANAGER.");
-//        }
+        if (!"MANAGER".equals(role)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied. User role is not MANAGER.");
+        }
 
         ProductsResponseDto response = productService.createProduct(productRequestDto, email);
 
@@ -32,13 +33,11 @@ public class ProductController {
     }
 
     @GetMapping("/products/{productId}")
-    public ResponseEntity<ProductsResponseDto> getProductById(@PathVariable Long productId) {
+    public ProductsResponseDto getProductById(@PathVariable Long productId) {
 
         ProductsResponseDto response = productService.getProductById(productId);
 
-        return ResponseEntity.status(HttpStatus.OK)
-                .header("Server-Port", serverPort)
-                .body(response);
+        return response;
     }
 
     @GetMapping("/products/{id}/reduceQuantity")

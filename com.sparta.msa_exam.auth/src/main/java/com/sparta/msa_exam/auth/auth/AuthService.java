@@ -46,14 +46,14 @@ public class AuthService {
     /**
      * 사용자 ID를 받아 JWT 액세스 토큰을 생성합니다.
      *
-     * @param email 사용자 email
-     * @param role 사용자 권한
+     * @param user 사용자
      * @return 생성된 JWT 액세스 토큰
      */
-    public String createAccessToken(String email, String role) {
+    public String createAccessToken(UserEntity user) {
         return "Bearer " + Jwts.builder()
-                .claim("email", email)
-                .claim("role", role)
+                .claim("userId", user.getId().toString())
+                .claim("email", user.getEmail())
+                .claim("role", user.getRole().toString())
                 .issuer(issuer)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + accessExpiration))
@@ -87,7 +87,7 @@ public class AuthService {
             throw new IllegalArgumentException("Invalid user ID or password");
         }
 
-        return createAccessToken(user.getEmail(), user.getRole().toString());
+        return createAccessToken(user);
     }
 
     public AuthUserResponse checkAccessToken(String token) {
@@ -100,6 +100,7 @@ public class AuthService {
             log.info("user : {}" , user.getEmail());
 
             return AuthUserResponse.builder()
+                    .userId(user.getId().toString())
                     .email(user.getEmail())
                     .role(user.getRole().toString())
                     .isValid(true)
@@ -132,7 +133,7 @@ public class AuthService {
                     -> new IllegalArgumentException("Invalid user ID"));
 
             if(!user.getRole().toString().equals(role)){
-                throw new IllegalArgumentException("Invalid user ID");
+                throw new IllegalArgumentException("Invalid user Role");
             }
 
             // 추가적인 검증 로직 (예: 토큰 만료 여부 확인 등)을 여기에 추가할 수 있습니다.

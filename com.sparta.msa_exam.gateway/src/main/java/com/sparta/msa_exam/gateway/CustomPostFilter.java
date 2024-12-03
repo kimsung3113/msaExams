@@ -28,7 +28,6 @@ public class CustomPostFilter implements GlobalFilter, Ordered {
             logger.info("Post Filter: Response status code is " + response.getStatusCode());
             // 여기에서 server port를 set? products 에서만 set 로드 밸런싱을 어디서 했냐? 체크
 
-
         }));
     }
 

@@ -24,5 +24,12 @@ public class OrderDetailEntity {
 
     private Integer product_count;
 
+    public static OrderDetailEntity createOrderDetailEntity(OrderEntity orders, Long product_id, Integer product_count) {
+        return OrderDetailEntity.builder()
+                .orders(orders)
+                .product_id(product_id)
+                .product_count(product_count)
+                .build();
+    }
 
 }

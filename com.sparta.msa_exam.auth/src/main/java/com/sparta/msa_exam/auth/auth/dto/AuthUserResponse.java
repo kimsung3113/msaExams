@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class AuthUserResponse {
 
+    private String userId;
     private String email;
     private String role;
     private boolean isValid;

@@ -42,4 +42,12 @@ public class OrderEntity {
         }
     }
 
+    public static OrderEntity createOrder(String userId, String email) {
+        return OrderEntity.builder()
+                .user_id(Long.parseLong(userId))
+                .createdBy(email)
+                .status(OrderStatus.CREATED)
+                .build();
+    }
+
 }
