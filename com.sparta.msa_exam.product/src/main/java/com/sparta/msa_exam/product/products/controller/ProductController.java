@@ -35,7 +35,8 @@ public class ProductController {
         ProductsResponseDto response = productService.createProduct(productRequestDto, email);
 
         return ResponseEntity.status(HttpStatus.OK)
-                .header("Server-Port", serverPort).body(response);
+                //.header("Server-Port", serverPort)
+                .body(response);
     }
 
     @GetMapping("/products/{productId}")
@@ -44,16 +45,20 @@ public class ProductController {
         ProductsResponseDto response = productService.getProductById(productId);
 
         return ResponseEntity.status(HttpStatus.OK)
-                .header("Server-Port", serverPort).body(response);
+                //.header("Server-Port", serverPort)
+                .body(response);
     }
 
     @GetMapping("/products")
     public ResponseEntity<Page<ProductsResponseDto>> getProducts(ProductSearchDto searchDto,
          @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
 
+        // Redis에서 page객체가 그대로 들어가 역직렬화 할때 에러가 발생된다..
         Page<ProductsResponseDto> response = productService.getProducts(searchDto, pageable);
 
-        return ResponseEntity.status(HttpStatus.OK).header("Server-Port", serverPort).body(response);
+        return ResponseEntity.status(HttpStatus.OK)
+                //.header("Server-Port", serverPort)
+                .body(response);
     }
 
     @GetMapping("/products/{id}/reduceQuantity")
